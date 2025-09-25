@@ -1,0 +1,14 @@
+{
+  "name": "lev3",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.0",
+    "@babel/preset-react": "^7.27.1",
+    "parcel": "^2.x.x"
+  }
+}
