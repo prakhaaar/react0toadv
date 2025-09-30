@@ -5,19 +5,17 @@ import Shimmer from "./Shimmer";
 
 //dynamic routng///
 
+//creation of custom hook
 function RestrauntMenu() {
-  const [resInfo, setResInfo] = useState(null);
-  useEffect(() => {
-    fetchData();
-  }, [id]); //dependency array for letting it mount only once//;
+  //lets deep dive and create a custom hook to improve the readability of code
+  const { id } = useParams();
+  //=======================>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<=================
 
-  //fetching the data using an async function
-  const fetchData = async () => {
-    const data = await fetch("https//randomdata");
-    const json = await data.json();
-    setResInfo(json.data); //setting it to the satate now we have our data;;
-  };
-  if (!resInfo) return Shimmer();
+  const resInfo = useResMen(id); //so our custom hook is created here
+
+  //==================>... our custom hook is calling for the data over the api and now our code looks
+  //much cleaner and readable
+  //=======================>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<=================
 
   return (
     <div>
