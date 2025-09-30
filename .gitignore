@@ -1,0 +1,12 @@
+# dependencies
+node_modules/
+.parcel-cache/
+dist/
+
+# build outputs
+*.log
+*.tmp
+
+# system files
+.DS_Store
+Thumbs.db
