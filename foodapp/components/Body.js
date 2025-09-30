@@ -2,6 +2,8 @@ import RestaurantCard from "./RestaurantCard";
 import { useEffect, useState } from "react"; /* This is named export */
 import Shimmer from "./Shimmer"; /* This is default export */
 import { FOODFIRE_API_URL } from "../../../public/Common/constants";
+// import resList from "../utils/mockData"; // Static data for testing purpose
+import RestrauntMenu from "../components/RestrauntMenu";
 
 // Filter the restaurant data according input type
 function filterData(searchText, restaurants) {
@@ -105,11 +107,16 @@ const Body = () => {
         <div className="restaurant-list">
           {/* We are mapping restaurants array and passing JSON array data to RestaurantCard component as props with unique key as restaurant.data.id */}
           {filteredRestaurants.map((restaurant) => {
+            <link
+              key={restaurant?.info?.id}
+              to={"/restaurant/" + restaurant?.info?.id}
+              component={RestrauntMenu}
+            />;
             return (
               <RestaurantCard
                 key={restaurant?.info?.id}
                 {...restaurant?.info}
-              />
+              /> //restruant card==>restraunt menu pr chhla jae
             );
           })}
         </div>
