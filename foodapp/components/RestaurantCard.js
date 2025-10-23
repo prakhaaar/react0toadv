@@ -43,7 +43,7 @@ const RestaurantCard = ({
 export const witPromotedLable = (RestaurantCard) => {
   return (
     <div>
-      <label>PROMOTED</label>
+      <label className="aboslute bg-black text-white m-2 p-2 rounded-r-lg">PROMOTED</label>
       <RestaurantCard />
     </div>
   );
