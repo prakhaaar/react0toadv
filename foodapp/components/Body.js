@@ -1,123 +1,136 @@
-import RestaurantCard from "./RestaurantCard";
-import { useEffect, useState } from "react"; /* This is named export */
-import Shimmer from "./Shimmer"; /* This is default export */
+// ---------- IMPORTS ----------
+import RestaurantCard, { witPromotedLable } from "./RestaurantCard"; // Default + named import
+import { useEffect, useState } from "react"; // React Hooks
+import Shimmer from "./Shimmer"; // Default export
 import { FOODFIRE_API_URL } from "../../../public/Common/constants";
-// import resList from "../utils/mockData"; // Static data for testing purpose
-import RestrauntMenu from "../components/RestrauntMenu";
+import RestrauntMenu from "../components/RestrauntMenu"; // (Will be used in routing)
 
-// Filter the restaurant data according input type
+// ---------- HELPER FUNCTION ----------
+// Filters restaurant data based on the search input
 function filterData(searchText, restaurants) {
-  const resFilterData = restaurants.filter((restaurant) =>
+  return restaurants.filter((restaurant) =>
     restaurant?.info?.name.toLowerCase().includes(searchText.toLowerCase())
   );
-  return resFilterData;
 }
 
-// Body Component for body section: It contain all restaurant cards
+// Higher Order Component (HOC) – adds "Promoted" label to a restaurant card
+const LabelPromoted = witPromotedLable(RestaurantCard);
+
+// ---------- MAIN COMPONENT ----------
 const Body = () => {
-  // useState: To create a state variable, searchText, allRestaurants and filteredRestaurants is local state variable
+  // ---------- STATE VARIABLES ----------
+  // searchText → keeps track of user's input in the search bar
+  // allRestaurants → stores all restaurant data from API
+  // filteredRestaurants → stores restaurants filtered by search
+  // errorMessage → displays message if no restaurant matches search input
   const [searchText, setSearchText] = useState("");
   const [allRestaurants, setAllRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // use useEffect for one time call getRestaurants using empty dependency array
+  // ---------- USE EFFECT ----------
+  // useEffect → runs once after the initial render to fetch restaurant data
   useEffect(() => {
     getRestaurants();
   }, []);
 
-  // async function getRestaurant to fetch Swiggy API data
+  // ---------- FETCH DATA FUNCTION ----------
+  // Fetches Swiggy API data and extracts restaurant info safely
   async function getRestaurants() {
-    // handle the error using try... catch
     try {
       const response = await fetch(FOODFIRE_API_URL);
       const json = await response.json();
 
-      // initialize checkJsonData() function to check Swiggy Restaurant data
+      // Helper function to safely extract restaurant list from Swiggy's complex JSON
       function checkJsonData(jsonData) {
         for (let i = 0; i < jsonData?.data?.cards.length; i++) {
-          // initialize checkData for Swiggy Restaurant data
           let checkData =
             json?.data?.cards[i]?.card?.card?.gridElements?.infoWithStyle
               ?.restaurants;
 
-          // if checkData is not undefined then return it
           if (checkData !== undefined) {
             return checkData;
           }
         }
       }
 
-      // call the checkJsonData() function which return Swiggy Restaurant data
+      // Get restaurant data
       const resData = checkJsonData(json);
 
-      // update the state variable restaurants with Swiggy API data
+      // Update state variables
       setAllRestaurants(resData);
       setFilteredRestaurants(resData);
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching restaurants:", error);
     }
   }
 
-  // use searchData function and set condition if data is empty show error message
+  // ---------- SEARCH FUNCTION ----------
+  // Filters data based on searchText; shows error message if no match
   const searchData = (searchText, restaurants) => {
     if (searchText !== "") {
       const filteredData = filterData(searchText, restaurants);
       setFilteredRestaurants(filteredData);
       setErrorMessage("");
+
       if (filteredData?.length === 0) {
-        setErrorMessage("No matches restaurant found");
+        setErrorMessage("No matching restaurant found 🍽️");
       }
     } else {
+      // Reset search
       setErrorMessage("");
       setFilteredRestaurants(restaurants);
     }
   };
 
-  // if allRestaurants is empty don't render restaurants cards
+  // ---------- EARLY RETURN ----------
+  // If restaurant data not available yet, don't render anything
   if (!allRestaurants) return null;
 
+  // ---------- JSX RETURN ----------
   return (
     <>
-      <div className="search-container">
+      {/* ---------- SEARCH BAR ---------- */}
+      <div className="search-container p-4 flex justify-center gap-2">
         <input
           type="text"
-          className="search-input"
-          placeholder="Search a restaurant you want..."
+          className="search-input border border-gray-400 rounded-lg px-3 py-2 w-1/3"
+          placeholder="Search for a restaurant..."
           value={searchText}
-          // update the state variable searchText when we typing in input box
-          onChange={(e) => setSearchText(e.target.value)}
-        ></input>
+          onChange={(e) => setSearchText(e.target.value)} // updates state as user types
+        />
         <button
-          className="search-btn"
-          onClick={() => {
-            // user click on button searchData function is called
-            searchData(searchText, allRestaurants);
-          }}
+          className="search-btn bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg"
+          onClick={() => searchData(searchText, allRestaurants)} // triggers search on click
         >
           Search
         </button>
       </div>
-      {errorMessage && <div className="error-container">{errorMessage}</div>}
 
-      {/* if restaurants data is not fetched then display Shimmer UI after the fetched data display restaurants cards */}
+      {/* ---------- ERROR MESSAGE ---------- */}
+      {errorMessage && (
+        <div className="error-container text-center text-red-600 font-semibold">
+          {errorMessage}
+        </div>
+      )}
+
+      {/* ---------- RESTAURANT LIST ---------- */}
+      {/* Show shimmer until data is fetched; then render restaurant cards */}
       {allRestaurants?.length === 0 ? (
         <Shimmer />
       ) : (
-        <div className="restaurant-list">
-          {/* We are mapping restaurants array and passing JSON array data to RestaurantCard component as props with unique key as restaurant.data.id */}
+        <div className="restaurant-list flex flex-wrap justify-center gap-6 p-6">
+          {/* Map over filteredRestaurants array and render a card for each restaurant */}
           {filteredRestaurants.map((restaurant) => {
-            <link
-              key={restaurant?.info?.id}
-              to={"/restaurant/" + restaurant?.info?.id}
-              component={RestrauntMenu}
-            />;
-            return (
-              <RestaurantCard
-                key={restaurant?.info?.id}
-                {...restaurant?.info}
-              /> //restruant card==>restraunt menu pr chhla jae
-            );
+            const info = restaurant?.info;
+
+            // Choose whether to render promoted label or normal card
+            const CardComponent = info?.promoted
+              ? LabelPromoted
+              : RestaurantCard;
+
+            // Return a clickable card linking to the restaurant’s menu
+            return <CardComponent key={info?.id} {...info} />;
           })}
         </div>
       )}

@@ -38,4 +38,15 @@ const RestaurantCard = ({
   );
 };
 
+//higher order component - RestaurantCard==>RestaurantCardWithPromotedLabel
+
+export const witPromotedLable = (RestaurantCard) => {
+  return (
+    <div>
+      <label>PROMOTED</label>
+      <RestaurantCard />
+    </div>
+  );
+};
+
 export default RestaurantCard;
