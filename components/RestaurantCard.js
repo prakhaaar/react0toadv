@@ -40,7 +40,7 @@ const RestaurantCard = ({
 
 //higher order component - RestaurantCard==>RestaurantCardWithPromotedLabel
 
-export const promotedLable = (RestaurantCard) => {
+export const witPromotedLable = (RestaurantCard) => {
   return (
     <div>
       <label>PROMOTED</label>
