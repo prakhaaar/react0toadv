@@ -1,37 +1,52 @@
-import { CDN_URL } from '../utils/constants';
+import { IMG_CDN_URL } from "../../../public/Common/constants";
 
-const RestaurantCard = (props) => {
-    const { resData } = props;
-
-    const {
-        cloudinaryImageId,
-        name,
-        cuisines,
-        avgRating,
-        costForTwo,
-        deliveryTime,
-    } = resData?.data;
-
-    return (
-        <div
-            className="res-card"
-            style={{
-                backgroundColor: '#f0f0f0',
-            }}
+// Restaurant card component: Image, name, cuisine
+const RestaurantCard = ({
+  cloudinaryImageId,
+  name,
+  cuisines,
+  areaName,
+  sla,
+  costForTwo,
+  avgRatingString,
+}) => {
+  return (
+    <div className="card">
+      <img src={IMG_CDN_URL + cloudinaryImageId} />
+      <h3>{name}</h3>
+      <h5>{cuisines.join(", ")}</h5>
+      <h5>{areaName}</h5>
+      <span>
+        <h4
+          style={
+            avgRatingString < 4
+              ? { backgroundColor: "var(--light-red)" }
+              : avgRatingString === "--"
+              ? { backgroundColor: "white", color: "black" }
+              : { color: "white" }
+          }
         >
-            <img
-                className="res-logo"
-                src={CDN_URL + cloudinaryImageId}
-                alt="Biryani"
-            />
+          <i className="fa-solid fa-star"></i>
+          {avgRatingString}
+        </h4>
+        <h4>•</h4>
+        <h4>{sla?.lastMileTravelString ?? "2.0 km"}</h4>
+        <h4>•</h4>
+        <h4>{costForTwo ?? "₹200 for two"}</h4>
+      </span>
+    </div>
+  );
+};
 
-            <h3>{name}</h3>
-            <h4>{cuisines.join(', ')}</h4>
-            <h4>{avgRating} stars</h4>
-            <h4>₹{costForTwo / 100} FOR TWO</h4>
-            <h4>{deliveryTime} minutes</h4>
-        </div>
-    );
+//higher order component - RestaurantCard==>RestaurantCardWithPromotedLabel
+
+export const promotedLable = (RestaurantCard) => {
+  return (
+    <div>
+      <label>PROMOTED</label>
+      <RestaurantCard />
+    </div>
+  );
 };
 
 export default RestaurantCard;
