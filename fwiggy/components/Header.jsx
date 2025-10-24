@@ -12,6 +12,10 @@ const Header = () => {
     //fetching data from context
     const {loggedInUser} = useContext(UserContext);
 
+    const cartItems=useSelector((store)=>store.cart.items);
+    //subscribing to our store using selector hook;
+    
+
     return (
     <nav className="flex flex-wrap mx-auto items-center justify-between p-6 lg:px-8 text-slate-300 bg-sky-800">
         <div>
