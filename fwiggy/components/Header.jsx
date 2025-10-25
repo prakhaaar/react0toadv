@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { LOGO_URL } from "../utils/constant";
+import { LOGO_URL } from "../utils/constant"; // <-- use imported URL
 import { Link } from "react-router-dom";
 import useOnlineStatus from "../utils/useOnlineStatus";
 import UserContext from "../utils/UserContext";
@@ -8,16 +8,13 @@ import { useSelector } from "react-redux";
 const Header = () => {
   const [btnName, setBtnName] = useState("Login");
   const onlineStatus = useOnlineStatus();
-
   const { loggedInUser } = useContext(UserContext);
-
-  // Redux cart items
   const cartItems = useSelector((store) => store.cart.items);
 
   return (
     <nav className="flex flex-wrap mx-auto items-center justify-between p-6 lg:px-8 text-slate-300 bg-sky-800">
       <div>
-        <img className="w-[100px]" src={LOGO_URL} alt="Logo" />
+        <img className="w-[100px]" src={LOGO_URL} alt="Logo" /> {/* use constant */}
       </div>
       <div>
         <ul className="flex flex-wrap m-1 p-1 items-center">
@@ -34,9 +31,7 @@ const Header = () => {
           <li className="p-2">
             <Link to="/contacts">Contacts</Link>
           </li>
-          <li className="p-2">
-            Cart ({cartItems.length})
-          </li>
+          <li className="p-2">Cart ({cartItems.length})</li>
           <li className="p-2">
             <button
               className="login-btn"
