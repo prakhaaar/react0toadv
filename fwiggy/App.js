@@ -1,8 +1,10 @@
-import React, {lazy, Suspense, useContext, useEffect, useState} from 'react';
+import React, { lazy, Suspense, useContext, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
+import appStore from './utils/appStore' // your redux store
+
 import Header from "./components/Header";
 import Body from "./components/Body";
-import About from "./components/About";
 import Error from "./components/Error";
 import Contacts from "./components/Contacts";
 import Loading from './components/Loading';
@@ -10,15 +12,7 @@ import RestaurantMenu from "./components/RestaurantMenu";
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import UserContext from "./utils/UserContext";
 
-/*
-    lazy loading (or) code splitting (or) chunking (or)
-    dynamic bundling (or) on demand loading (or)
-
-    lazy lets you defer loading component’s code until it is rendered for the first time.
-    dynamic import with the path
-
-    on demand lazy loading while clicking on Grocery for making it as a small bundler, check it in dist folder
-*/
+// Lazy loaded components
 const Grocery = lazy(() => import("./components/Grocery"));
 const About = lazy(() => import("./components/About"));
 
@@ -26,57 +20,53 @@ const AppLayout = () => {
     const [userName, setUserName] = useState();
 
     useEffect(() => {
-        //make an api call and send username & password
-        const data = {
-            name : "Prakhar",
-        };
-
-        setUserName(data.name);
+        setUserName("Prakhar");
     }, []);
 
-    return <div>
-            <UserContext.Provider value={{loggedInUser: userName, setUserName}}>
-                <Header/>
-                <Outlet/>
-            </UserContext.Provider>
-        </div>
-}
+    return (
+        <UserContext.Provider value={{ loggedInUser: userName, setUserName }}>
+            <Header />
+            <Outlet />
+        </UserContext.Provider>
+    );
+};
 
-//Router Configuration
+// Wrap the whole app with Redux Provider
+const RootApp = () => (
+    <Provider store={appStore}>
+        <RouterProvider router={appRouter} />
+    </Provider>
+);
+
+// Router configuration
 const appRouter = createBrowserRouter([
     {
         path: "/",
-        element : <AppLayout/>,
-        children: 
-        [
-            {
-                path: "/",
-                element: <Body/>,
-            },
+        element: <AppLayout />,
+        children: [
+            { path: "/", element: <Body /> },
             {
                 path: "/about",
-                element: <About/>,
+                element: (
+                    <Suspense fallback={<Loading />}>
+                        <About />
+                    </Suspense>
+                ),
             },
             {
                 path: "/grocery",
-                element: <Suspense fallback={<Loading/>}>
-                    <Grocery/>
-                </Suspense>,
+                element: (
+                    <Suspense fallback={<Loading />}>
+                        <Grocery />
+                    </Suspense>
+                ),
             },
-            {
-                path: "/contacts",
-                element: <Contacts/>,
-            },
-            {
-                path: "/restaurant/:resId", //: used for dynamic routing (resId is a param which differentiates the restaurants)
-                element: <RestaurantMenu/>
-            },
+            { path: "/contacts", element: <Contacts /> },
+            { path: "/restaurant/:resId", element: <RestaurantMenu /> },
         ],
-        errorElement: <Error/>,//shows error page
+        errorElement: <Error />,
     },
-    
-])
-const root = createRoot(document.getElementById("root"));
+]);
 
-//Providing router configuration(appRouter) to the AppLayout
-root.render(<RouterProvider router={appRouter}/>);
+const root = createRoot(document.getElementById("root"));
+root.render(<RootApp />);
