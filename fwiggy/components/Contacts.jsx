@@ -44,7 +44,7 @@ const Contacts = () => {
           >
             Send Message
           </button>
-        </form>
+       </form>
       </div>
     </div>
   );
